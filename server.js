@@ -15,16 +15,18 @@ if (!fs.existsSync('./uploads')){
     fs.mkdirSync('./uploads');
 }
 
-// Fungsi Baca Database Aman
+// Fungsi Baca Database Aman (Versi Vercel Serverless)
 function bacaDatabase() {
-    if (!fs.existsSync(FILE_DATABASE)) {
-        const dataDefault = [];
-        fs.writeFileSync(FILE_DATABASE, JSON.stringify(dataDefault, null, 2));
-        return dataDefault;
+    // Pastikan jalurnya absolut memakai path.join
+    const dbPath = path.join(__dirname, 'database.json');
+    
+    // Kalau filenya gak ada, langsung kembalikan array kosong (Jangan dipaksa nulis file baru!)
+    if (!fs.existsSync(dbPath)) {
+        return [];
     }
     try {
-        const mentah = fs.readFileSync(FILE_DATABASE, 'utf-8');
-        return JSON.parse(mentah);
+        const mentah = fs.readFileSync(dbPath, 'utf-8');
+        return JSON.parse(mentah || '[]');
     } catch (e) {
         return [];
     }
@@ -82,9 +84,14 @@ const upload = multer({
 });
 
 // ================= RUTE UTAMA KOMIK =================
-app.get('/', (req, res) => { 
-    daftarKomik = bacaDatabase();
-    res.render('index', { daftarKomik: daftarKomik }); 
+app.get('/', (req, res) => {
+    try {
+        const daftarKomik = bacaDatabase();
+        res.render('index', { daftarKomik: daftarKomik });
+    } catch (error) {
+        console.error("Eror pas buka halaman utama:", error);
+        res.status(500).send("Ada masalah pada server backend.");
+    }
 });
 
 // ==================== [SISTEM ROUTE VIDEO / HENTAI] ====================
