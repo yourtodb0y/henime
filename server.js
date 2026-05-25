@@ -501,6 +501,4 @@ if (process.env.NODE_ENV !== 'production') {
 
 // Ini WAJIB hukumnya buat Vercel Serverless
 module.exports = app;
-xserver.timeout = 900000;
-server.keepAliveTimeout = 900000;
 
