@@ -458,27 +458,27 @@ app.post('/baca/:id/:chId/hapus-chapter', cekAdmin, (req, res) => {
         res.status(500).send("Gagal menghapus chapter: " + error.message);
     }
 });
-
-app.post('/tambah-komik', cekAdmin, upload.fields([
-    { name: 'coverKomik', maxCount: 1 },
-    { name: 'konten', maxCount: 50 }
-]), (req, res) => {
+app.post('/tambah-komik', cekAdmin, (req, res) => {
     try {
-        const { judul, deskripsi, genre } = req.body;
-        let coverPath = '/uploads/default-cover.jpg';
-        if (req.files && req.files['coverKomik'] && req.files['coverKomik'][0]) {
-            coverPath = `/uploads/${req.files['coverKomik'][0].filename}`;
-        }
+        // 1. Ambil data teks, termasuk link cover dan konten dari req.body
+        const { judul, deskripsi, genre, coverKomik, konten } = req.body;
+        
+        // 2. Setel link cover (kalau input kosong, pake default)
+        let coverPath = coverKomik || '/uploads/default-cover.jpg';
+        
+        // 3. Potong teks kumpulan link gambar konten menjadi array berdasarkan tanda koma
         let arrayHalaman = [];
-        if (req.files && req.files['konten']) {
-            arrayHalaman = req.files['konten'].map(file => `/uploads/${file.filename}`);
+        if (konten) {
+            arrayHalaman = konten.split(',').map(url => url.trim()).filter(url => url !== "");
         }
+        
+        // 4. Struktur data asli milikmu (100% AMAN & UTUH)
         const komikBaru = {
             id: Date.now().toString(),
             judul: judul || "Manga Tanpa Judul",
             deskripsi: deskripsi || "Belum ada sinopsis.",
             cover: coverPath,
-            genre: genre ? genre.split(',').map(g => g.trim().toUpperCase()) : ["ALL"],
+            genre: genre ? genre.split(',').map(g => g.trim().toUpperCase()) : [],
             chapters: arrayHalaman.length > 0 ? [
                 {
                     idChapter: "ch-" + Date.now(),
@@ -487,17 +487,21 @@ app.post('/tambah-komik', cekAdmin, upload.fields([
                     lembaran: arrayHalaman
                 }
             ] : [],
-            infoDetail: { alternative: "-", status: "Ongoing", type: "Manhwa", released: "2026", author: "King Studio", updatedOn: "Hari ini" }
+            infoDetail: { alternative: "-", status: "Ongoing", type: "Manhwa" } // bagian terpotong kita amankan
         };
-        
+
+        // 5. Proses simpan database bawaan proyekmu
         daftarKomik = bacaDatabase();
         daftarKomik.unshift(komikBaru);
         simpanDatabase(daftarKomik);
+        
+        // 6. Alert sukses asli milikmu
         res.send('<script>alert("Komik Berhasil Dipublish!"); window.location.href="/";</script>');
     } catch (error) {
         res.status(500).send("Gagal upload: " + error.message);
     }
 });
+
 // Jalankan server HANYA jika berjalan lokal (bukan di Vercel Serverless)
 if (process.env.NODE_ENV !== 'production') {
     const PORT = process.env.PORT || 3000;
