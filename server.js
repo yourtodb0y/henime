@@ -491,11 +491,15 @@ app.post('/tambah-komik', cekAdmin, upload.fields([
         res.status(500).send("Gagal upload: " + error.message);
     }
 });
+// Jalankan server HANYA jika berjalan lokal (bukan di Vercel Serverless)
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`🚀 Server berjalan megah di http://localhost:${PORT}`);
+    });
+}
 
-// Jalankan Server
-const server = app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Server berjalan megah di http://localhost:${PORT}`);
-});
+// Ini WAJIB hukumnya buat Vercel Serverless
 module.exports = app;
 xserver.timeout = 900000;
 server.keepAliveTimeout = 900000;
