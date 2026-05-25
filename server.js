@@ -8,34 +8,42 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // FILE DATABASE FISIK JSON
-const FILE_DATABASE = './database.json';
-
+const FILE_DATABASE = path.join('/tmp', 'database.json');
 // Buat folder uploads jika belum ada
 if (!fs.existsSync('./uploads')){
     fs.mkdirSync('./uploads');
 }
 
-// Fungsi Baca Database Aman (Versi Vercel Serverless)
+// Fungsi Baca Database Versi Aman Vercel
 function bacaDatabase() {
-    // Pastikan jalurnya absolut memakai path.join
-    const dbPath = path.join(__dirname, 'database.json');
-    
-    // Kalau filenya gak ada, langsung kembalikan array kosong (Jangan dipaksa nulis file baru!)
-    if (!fs.existsSync(dbPath)) {
-        return [];
-    }
     try {
-        const mentah = fs.readFileSync(dbPath, 'utf-8');
+        // Kalau file di /tmp belum ada, coba cek apakah ada file default di root project
+        if (!fs.existsSync(FILE_DATABASE)) {
+            const rootDbPath = path.join(__dirname, 'database.json');
+            if (fs.existsSync(rootDbPath)) {
+                // Copy data awal dari root ke /tmp agar bisa dimodifikasi
+                const dataAwal = fs.readFileSync(rootDbPath, 'utf-8');
+                fs.writeFileSync(FILE_DATABASE, dataAwal);
+                return JSON.parse(dataAwal || '[]');
+            }
+            return [];
+        }
+        const mentah = fs.readFileSync(FILE_DATABASE, 'utf-8');
         return JSON.parse(mentah || '[]');
     } catch (e) {
         return [];
     }
 }
 
-// Fungsi Simpan Database
+// Fungsi Simpan Database Versi Aman Vercel (Bebas EROFS)
 function simpanDatabase(data) {
-    fs.writeFileSync(FILE_DATABASE, JSON.stringify(data, null, 2));
+    try {
+        fs.writeFileSync(FILE_DATABASE, JSON.stringify(data, null, 2));
+    } catch (error) {
+        console.error("Gagal menulis ke temporary database:", error);
+    }
 }
+
 
 let daftarKomik = bacaDatabase();
 
