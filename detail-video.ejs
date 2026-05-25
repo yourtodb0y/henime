@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= video.judul %> - Detail Season</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
+        body { background: #f4f4f4; color: #333; padding-bottom: 50px; }
+        
+        .container { max-width: 600px; margin: 0 auto; background: #fff; min-height: 100vh; padding: 15px; }
+        
+        /* Area Abu-abu: Cover */
+        .cover-area { width: 100%; height: 300px; border-radius: 10px; overflow: hidden; margin-bottom: 15px; background: #ccc; }
+        .cover-area img { width: 100%; height: 100%; object-fit: cover; }
+
+        h2 { font-size: 20px; margin-bottom: 10px; }
+
+        /* Area Biru: Genre */
+        .genre-container { margin-bottom: 15px; }
+        .badge-genre { display: inline-block; background: #3498db; color: white; padding: 5px 10px; border-radius: 15px; font-size: 12px; margin-right: 5px; margin-bottom: 5px; font-weight: bold; }
+
+        /* Area Merah & Hapus */
+        .action-buttons { display: flex; justify-content: space-between; margin-bottom: 20px; gap: 10px; }
+        .btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: white; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .btn-favorit { background: #e74c3c; }
+        .btn-delete { background: #c0392b; }
+
+        /* Area Hijau: Tombol Baca/Nonton Cepat */
+        .quick-nav { display: flex; gap: 10px; margin-bottom: 20px; }
+        .btn-green { flex: 1; background: #2ecc71; color: white; padding: 12px; border-radius: 8px; text-align: center; text-decoration: none; font-weight: bold; font-size: 14px; }
+        
+        /* Area Pink: Admin Tambah Episode */
+        .admin-panel { background: #ffebee; border: 2px dashed #ff4081; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+        .admin-panel h3 { color: #ff4081; margin-bottom: 10px; font-size: 16px; }
+        .form-group { margin-bottom: 10px; }
+        .form-group input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; }
+        .btn-pink { background: #ff4081; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; }
+
+        /* Area Ungu: List Episode */
+        .episode-list { margin-top: 20px; }
+        .episode-list h3 { color: #8e44ad; margin-bottom: 10px; font-size: 18px; border-bottom: 2px solid #8e44ad; padding-bottom: 5px; }
+        .episode-item { display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; padding: 12px 15px; margin-bottom: 10px; border-radius: 8px; border-left: 4px solid #8e44ad; text-decoration: none; color: #333; }
+        .episode-item:hover { background: #f1e0fa; }
+        .episode-title { font-weight: bold; }
+        .btn-hapus-ep { background: red; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="/Hentai" style="display: inline-block; margin-bottom: 15px; color: #333; text-decoration: none; font-weight: bold;">
+        <i class="fa-solid fa-arrow-left"></i> Kembali ke List Video
+    </a>
+
+    <div class="cover-area">
+        <img src="<%= video.gambarPreview %>" alt="Cover">
+    </div>
+
+    <h2><%= video.judul %></h2>
+
+    <div class="genre-container">
+        <% if (video.genres && video.genres.length > 0) { %>
+            <% video.genres.forEach(g => { %>
+                <span class="badge-genre"><%= g %></span>
+            <% }) %>
+        <% } else { %>
+            <span class="badge-genre">Tanpa Genre</span>
+        <% } %>
+    </div>
+
+    <div class="action-buttons">
+        <button class="btn btn-favorit"><i class="fa-solid fa-heart"></i> Favorit</button>
+        
+        <% if (typeof isAdmin !== 'undefined' && isAdmin) { %>
+            <form action="/Hentai/<%= video.id %>/hapus-season" method="POST" style="flex: 1; margin: 0;" onsubmit="return confirm('Yakin ingin menghapus seluruh Season ini beserta semua episodenya?');">
+                <button type="submit" class="btn btn-delete" style="width: 100%;"><i class="fa-solid fa-trash"></i> Delete Season</button>
+            </form>
+        <% } %>
+    </div>
+
+    <% 
+        let epPertama = (video.episodes && video.episodes.length > 0) ? video.episodes[video.episodes.length - 1] : null; 
+        let epTerbaru = (video.episodes && video.episodes.length > 0) ? video.episodes[0] : null; 
+    %>
+    <div class="quick-nav">
+        <% if (epPertama) { %>
+            <a href="/Hentai/nonton/<%= video.id %>/<%= epPertama.idEpisode %>" class="btn-green">Awal Episode</a>
+        <% } else { %>
+            <button class="btn-green" style="background: #ccc; cursor: not-allowed;">Belum ada Episode</button>
+        <% } %>
+
+        <% if (epTerbaru) { %>
+            <a href="/Hentai/nonton/<%= video.id %>/<%= epTerbaru.idEpisode %>" class="btn-green">Episode Terbaru</a>
+        <% } else { %>
+            <button class="btn-green" style="background: #ccc; cursor: not-allowed;">Belum ada Episode</button>
+        <% } %>
+    </div>
+
+    <% if (typeof isAdmin !== 'undefined' && isAdmin) { %>
+        <div class="admin-panel">
+            <h3><i class="fa-solid fa-plus-circle"></i> Tambah Episode Baru</h3>
+            <form action="/Hentai/<%= video.id %>/tambah-episode" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <input type="text" name="judulEpisode" placeholder="Nama Episode (Misal: Episode 01)" required>
+                </div>
+                <div class="form-group">
+                    <label style="font-size: 12px; color: #666;">File Video Episode:</label>
+                    <input type="file" name="videoFile" accept="video/*" required>
+                </div>
+                <button type="submit" class="btn-pink">UPLOAD EPISODE</button>
+            </form>
+        </div>
+    <% } %>
+
+    <div class="episode-list">
+        <h3><i class="fa-solid fa-list"></i> Daftar Episode</h3>
+        
+        <% if (video.episodes && video.episodes.length > 0) { %>
+            <% video.episodes.forEach(ep => { %>
+                <div class="episode-item">
+                    <a href="/Hentai/nonton/<%= video.id %>/<%= ep.idEpisode %>" style="flex: 1; text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
+                        <i class="fa-solid fa-play-circle" style="color: #8e44ad; font-size: 20px;"></i>
+                        <span class="episode-title"><%= ep.judulEpisode %></span>
+                    </a>
+
+                    <% if (typeof isAdmin !== 'undefined' && isAdmin) { %>
+                        <form action="/Hentai/<%= video.id %>/hapus-episode/<%= ep.idEpisode %>" method="POST" style="margin: 0;" onsubmit="return confirm('Hapus episode ini?');">
+                            <button type="submit" class="btn-hapus-ep"><i class="fa-solid fa-times"></i> Hapus</button>
+                        </form>
+                    <% } %>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <p style="text-align: center; color: #666; font-size: 14px; margin-top: 20px;">Season ini belum memiliki episode.</p>
+        <% } %>
+    </div>
+
+</div>
+
+</body>
+</html>
+

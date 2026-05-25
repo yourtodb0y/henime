@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Video Baru - Admin Panel</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .upload-container {
+            background-color: #1e1e1e;
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            border: 1px solid #2d2d2d;
+        }
+
+        .upload-title {
+            color: #ff8c00;
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ccc;
+        }
+
+        .form-group input[type="text"],
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: #2a2a2a;
+            border: 1px solid #3d3d3d;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group textarea :focus {
+            border-color: #ff8c00;
+            outline: none;
+            background-color: #333;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group input[type="file"] {
+            background-color: #2a2a2a;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px dashed #444;
+            color: #bbb;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background-color: #ff8c00;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background-color: #e07b00;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #aaa;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #ff8c00;
+        }
+    </style>
+</head>
+<body>
+
+<div class="upload-container">
+    <h2 class="upload-title">🎥 Upload Video Baru</h2>
+
+    <form action="/admin/upload-video" method="POST" enctype="multipart/form-data">
+        
+        <div class="form-group">
+            <label for="judul">Judul Video / Season</label>
+            <input type="text" id="judul" name="judul" placeholder="Masukkan judul video..." required>
+        </div>
+
+        <div class="form-group">
+            <label for="deskripsi">Deskripsi / Sinopsis Video</label>
+            <textarea id="deskripsi" name="deskripsi" placeholder="Masukkan deskripsi cerita video..." required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="genres">Genre Video</label>
+            <input type="text" id="genres" name="genres" placeholder="Contoh: Action, Romance, School (Pisahkan dengan koma)" required>
+        </div>
+
+        <div class="form-group">
+            <label for="videoFile">File Video Utama (MP4 - Opsional)</label>
+            <input type="file" id="videoFile" name="videoFile" accept="video/*">
+        </div>
+
+        <div class="form-group">
+            <label for="posterFile">Gambar Sampul / Poster (PNG/JPG)</label>
+            <input type="file" id="posterFile" name="posterFile" accept="image/*" required>
+        </div>
+
+        <button type="submit" class="btn-submit">Mulai Upload Video</button>
+    </form>
+
+    <a href="/Hentai" class="back-link">⬅ Kembali ke Beranda Video</a>
+</div>
+
+</body>
+</html>
+

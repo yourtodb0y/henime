@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= video.judul %> - Detail Video</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
+        
+        body {
+            background: linear-gradient(to bottom, #fffbeb, #e2b0ff, #9f75b8);
+            min-height: 100vh;
+            color: #333;
+            padding: 15px;
+            padding-bottom: 80px;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        body.dark-mode {
+            background: #121212 !important;
+            color: #f0f0f0 !important;
+        }
+
+        .container-detail {
+            max-width: 600px;
+            margin: 10px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: background 0.3s ease;
+        }
+
+        body.dark-mode .container-detail {
+            background: #1e1e1e;
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .back-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+            color: #8e44ad;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        body.dark-mode .back-nav { color: #ff69b4; }
+
+        /* [2. WARNA ABU-ABU] - Thumbnail Cover */
+        .cover-thumbnail {
+            width: 100%;
+            height: auto;
+            max-height: 320px;
+            border-radius: 10px;
+            object-fit: cover;
+            background-color: #7f8c8d;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        /* [4. WARNA BIRU] - Badge Genre */
+        .genre-container {
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .badge-biru {
+            background: #3498db;
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* [3. WARNA MERAH] - Action Buttons */
+        .action-flex {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .btn-action {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+        .btn-merah {
+            background: #e74c3c;
+            color: white;
+        }
+        .btn-merah-delete {
+            background: #c0392b;
+            color: white;
+            width: 100%;
+        }
+
+        /* [1. WARNA HIJAU] - Quick Nav Episode */
+        .quick-nav-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        .btn-hijau {
+            flex: 1;
+            background: #2ecc71;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 3px 6px rgba(46,204,113,0.2);
+            text-transform: uppercase;
+            border: none;
+        }
+        .btn-hijau-disabled {
+            flex: 1;
+            background: #bdc3c7;
+            color: #7f8c8d;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: not-allowed;
+            text-transform: uppercase;
+            border: none;
+        }
+
+        /* [5. WARNA PINK] - Panel Admin */
+        .panel-pink {
+            background: #fff0f5;
+            border: 2px dashed #ff69b4;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            color: #333;
+        }
+        body.dark-mode .panel-pink {
+            background: #25121c;
+            border-color: #ff69b4;
+            color: #fff;
+        }
+        .panel-pink h4 {
+            color: #ff69b4;
+            margin-bottom: 12px;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .input-pink {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ffb6c1;
+            border-radius: 6px;
+            outline: none;
+            background: #fff;
+            color: #333;
+        }
+        body.dark-mode .input-pink {
+            background: #1e1e1e;
+            border-color: #555;
+            color: #fff;
+        }
+        .btn-pink-submit {
+            background: #ff69b4;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        /* [6. WARNA UNGU] - List Episode */
+        .list-ungu-box {
+            margin-top: 15px;
+        }
+        .judul-ungu {
+            color: #9b59b6;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #9b59b6;
+            padding-bottom: 6px;
+            text-transform: uppercase;
+        }
+        body.dark-mode .judul-ungu { color: #be7cee; border-color: #be7cee; }
+
+        .episode-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fdf6ff;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border-left: 4px solid #9b59b6;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        body.dark-mode .episode-row {
+            background: #251e2a;
+            border-left-color: #be7cee;
+        }
+
+        .episode-link {
+            flex: 1;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .btn-hapus-single {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-detail">
+    <a href="/Hentai" class="back-nav"><i class="fa-solid fa-chevron-left"></i> Kembali ke Video Hanime</a>
+
+    <img src="<%= video.gambarPreview || '/uploads/default-cover.jpg' %>" class="cover-thumbnail" alt="Cover Video">
+
+    <h2><%= video.judul %></h2>
+
+    <div class="deskripsi-box" style="font-size: 13px; color: #bbb; line-height: 1.5; margin-bottom: 20px; padding: 5px 2px;">
+        <p><%= video.deskripsi || 'Belum ada deskripsi untuk video ini, bre.' %></p>
+    </div>
+
+<div class="genre-container" style="margin-bottom: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
+    <% if (video.genres && Array.isArray(video.genres) && video.genres.length > 0) { %>
+        <% video.genres.forEach(g => { %>
+            <span class="badge-biru"><%= g %></span>
+        <% }) %>
+    <% } else if (video.genre && Array.isArray(video.genre) && video.genre.length > 0) { %>
+        <% video.genre.forEach(g => { %>
+            <span class="badge-biru"><%= g %></span>
+        <% }) %>
+    <% } else { %>
+        <span class="badge-biru" style="background: #95a5a6;">ALL</span>
+    <% } %>
+</div>
+
+    <div class="action-flex">
+        <button class="btn-action btn-merah"><i class="fa fa-heart"></i> Favorit</button>
+        
+        <% if (typeof isAdmin !== 'undefined' && isAdmin) { %>
+            <div style="flex: 1;">
+                <form action="/Hentai/delete-season/<%= video.id %>" method="POST" onsubmit="return confirm('Hapus total seluruh season beserta file fisiknya, bre?');">
+                    <button type="submit" class="btn-action btn-merah-delete"><i class="fa-solid fa-trash"></i> Delete Season</button>
+                </form>
+            </div>
+        <% } %>
+    </div>
+
+    <% 
+        let episodes = video.episodes || [];
+        let awalEpisode = episodes.length > 0 ? episodes[episodes.length - 1] : null;
+        let terbaruEpisode = episodes.length > 0 ? episodes[0] : null;
+    %>
+    <div class="quick-nav-container">
+        <% if (awalEpisode) { %>
+            <a href="/Hentai/tonton/<%= video.id %>/<%= awalEpisode.idEpisode %>" class="btn-hijau">Awal Episode</a>
+        <% } else { %>
+            <button class="btn-hijau-disabled">Awal Episode</button>
+        <% } %>
+
+        <% if (terbaruEpisode) { %>
+            <a href="/Hentai/tonton/<%= video.id %>/<%= terbaruEpisode.idEpisode %>" class="btn-hijau">Episode Terbaru</a>
+        <% } else { %>
+            <button class="btn-hijau-disabled">Episode Terbaru</button>
+        <% } %>
+    </div>
+
+    <% if (typeof isAdmin !== 'undefined' && isAdmin) { %>
+        <div class="panel-pink">
+            <h4><i class="fa-solid fa-square-plus"></i> Panel Admin: Tambah Episode</h4>
+            <form action="/Hentai/<%= video.id %>/tambah-episode" method="POST" enctype="multipart/form-data">
+                <input type="text" name="judulEpisode" class="input-pink" placeholder="Contoh: Episode 01 atau Full Episode..." required>
+                <div style="margin-bottom: 12px;">
+                    <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 5px;">File Video Baru:</label>
+                    <input type="file" name="videoFile" accept="video/*" required>
+                </div>
+                <button type="submit" class="btn-pink-submit">Upload Episode</button>
+            </form>
+        </div>
+    <% } %>
+
+    <div class="list-ungu-box">
+        <div class="judul-ungu"><i class="fa-solid fa-layer-group"></i> Daftar Episode</div>
+        
+        <% if (episodes.length > 0) { %>
+            <% episodes.forEach(ep => { %>
+                <div class="episode-row">
+                    <a href="/Hentai/tonton/<%= video.id %>/<%= ep.idEpisode %>" class="episode-link">
+                        <i class="fa-solid fa-circle-play" style="color: #9b59b6;"></i>
+                        <span><%= ep.judulEpisode %></span>
+                    </a>
+
+                    <% if (typeof isAdmin !== 'undefined' && isAdmin) { %>
+                        <form action="/Hentai/hapus-episode/<%= video.id %>/<%= ep.idEpisode %>" method="POST" style="margin:0;" onsubmit="return confirm('Hapus episode ini?');">
+                            <button type="submit" class="btn-hapus-single"><i class="fa-solid fa-trash-can"></i></button>
+                        </form>
+                    <% } %>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <p style="text-align: center; color: #888; font-size: 13px; padding: 15px 0;">Belum ada episode di dalam season ini.</p>
+        <% } %>
+    </div>
+</div>
+
+<script>
+    // Sinkronisasi dengan Dark/Light mode dari localstorage tokomu
+    document.addEventListener("DOMContentLoaded", function() {
+        const temaAktif = localStorage.getItem('kingKomikTheme') || 'light';
+        if (temaAktif === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    });
+</script>
+</body>
+</html>
+

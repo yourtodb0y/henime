@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Video Hanime</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: #121212; color: #fff; padding: 15px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header h1 { font-size: 20px; color: #ff69b4; }
+        .btn-action-top { color: #fff; text-decoration: none; font-size: 13px; background: #333; padding: 8px 12px; border-radius: 5px; font-weight: bold; }
+        .grid-video { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .card-video { background: #1e1e1e; border-radius: 8px; overflow: hidden; text-decoration: none; color: #fff; display: block; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .card-video img { width: 100%; height: 120px; object-fit: cover; }
+        .card-info { padding: 8px; }
+        .video-title { font-size: 13px; font-weight: bold; line-height: 1.2; height: 32px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .video-meta { font-size: 11px; color: #aaa; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1><i class="fa-solid fa-video"></i> Koleksi Video</h1>
+        <div style="display: flex; gap: 8px;">
+            <% if (typeof isAdmin !== 'undefined' && isAdmin) { %>
+                <a href="/admin/upload-video" class="btn-action-top" style="background: #ff69b4;"><i class="fa-solid fa-plus"></i> Bikin Season</a>
+            <% } %>
+            <a href="/" class="btn-action-top"><i class="fa-solid fa-house"></i> Home</a>
+        </div>
+    </div>
+
+    <div class="grid-video">
+        <% if (Hentai && Hentai.length > 0) { %>
+            <% Hentai.forEach(v => { %>
+                <a href="/Hentai/detail/<%= v.id %>" class="card-video">
+                    <img src="<%= v.gambarPreview || '/uploads/default-cover.jpg' %>" alt="Cover">
+                    <div class="card-info">
+                        <div class="video-title"><%= v.judul %></div>
+                        <div class="video-meta">
+                            <i class="fa-solid fa-film"></i> <%= (v.episodes) ? v.episodes.length : 0 %> Episode
+                        </div>
+                    </div>
+                </a>
+            <% }) %>
+        <% } else { %>
+            <p style="grid-column: span 2; text-align: center; color: #888; font-size: 14px; margin-top: 20px;">Belum ada koleksi video.</p>
+        <% } %>
+    </div>
+
+</body>
+</html>
+

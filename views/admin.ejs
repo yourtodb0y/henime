@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - King Komik</title>
+    <style>
+        body { background-color: #121212; color: white; font-family: Arial, sans-serif; padding: 20px; }
+        .box { max-width: 500px; margin: auto; background: #1e1e1e; padding: 20px; border-radius: 8px; }
+        input, textarea, button { width: 100%; padding: 10px; margin: 10px 0; border-radius: 4px; border: none; box-sizing: border-box; }
+        input[type="text"], textarea { background: #2d2d2d; color: white; }
+        button { background: #2ecc71; color: white; font-weight: bold; cursor: pointer; }
+        .back { color: #aaa; text-decoration: none; display: inline-block; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <a href="/" class="back">← Kembali ke Beranda</a>
+    <h2 style="text-align: center; color: #ff79c6;">ADMIN POST</h2>
+    
+    <form action="/tambah-komik" method="POST" enctype="multipart/form-data">
+        <label>Judul Komik</label>
+        <input type="text" name="judul" required placeholder="Masukkan judul...">
+
+        <label>Deskripsi / Sinopsis</label>
+        <textarea name="deskripsi" rows="4" required placeholder="Masukkan sinopsis..."></textarea>
+
+        <label>Genre (Pisahkan dengan koma)</label>
+        <input type="text" name="genre" placeholder="Contoh: ACTION, FANTASY">
+
+        <label>Upload Gambar Cover</label>
+        <input type="file" name="coverKomik" accept="image/*" required>
+
+        <label>Upload Isi Halaman Komik (Bisa pilih banyak)</label>
+        <input type="file" name="konten" accept="image/*" multiple>
+
+        <button type="submit">PUBLISH KOMIK</button>
+    </form>
+</div>
+
+</body>
+</html>
+

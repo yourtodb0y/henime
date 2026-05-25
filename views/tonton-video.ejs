@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nonton <%= episodeAktif.judulEpisode %> - <%= season.judul %></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
+        
+        body {
+            background: #121212;
+            color: #f0f0f0;
+            min-height: 100vh;
+            padding-bottom: 40px;
+        }
+
+        .container-player {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #1a1a1a;
+            min-height: 100vh;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: #222;
+            border-bottom: 1px solid #333;
+        }
+        .btn-back {
+            color: #ff69b4;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Video Area */
+        .video-wrapper {
+            width: 100%;
+            background: #000;
+            position: relative;
+            aspect-ratio: 16 / 9;
+        }
+        .video-wrapper video {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Info Area */
+        .video-details {
+            padding: 15px;
+        }
+        .season-title {
+            font-size: 14px;
+            color: #ff69b4;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .episode-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            line-height: 1.3;
+        }
+
+        /* Episode Navigation (Prev / Next) */
+        .episode-control-nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            background: #222;
+            margin: 15px;
+            border-radius: 8px;
+            gap: 10px;
+        }
+        .btn-control {
+            flex: 1;
+            padding: 10px;
+            background: #333;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 13px;
+            border-radius: 5px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            border: 1px solid #444;
+        }
+        .btn-control:hover {
+            background: #444;
+        }
+        .btn-control.disabled {
+            background: #1c1c1c;
+            color: #555;
+            border: 1px solid #222;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* Playlist Bawah Player */
+        .playlist-area {
+            padding: 0 15px;
+        }
+        .playlist-title {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-left: 3px solid #ff69b4;
+            padding-left: 8px;
+        }
+        .playlist-scroll {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        .playlist-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #222;
+            padding: 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #ccc;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .playlist-item:hover {
+            background: #2c2c2c;
+            color: #fff;
+        }
+        .playlist-item.active {
+            background: #ff69b422;
+            color: #ff69b4;
+            border: 1px solid #ff69b4;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-player">
+    
+    <div class="top-nav">
+        <a href="/Hentai/detail/<%= season.id %>" class="btn-back">
+            <i class="fa-solid fa-arrow-left"></i> Kembali ke Detail Season
+        </a>
+    </div>
+
+    <div class="video-wrapper">
+        <video controls autoplay poster="<%= season.gambarPreview %>">
+            <source src="<%= episodeAktif.urlVideo %>" type="video/mp4">
+            Browser kamu tidak mendukung pemutaran video, bre.
+        </video>
+    </div>
+
+    <div class="video-details">
+        <div class="season-title"><%= season.judul %></div>
+        <div class="episode-title"><%= episodeAktif.judulEpisode %></div>
+    </div>
+
+    <% 
+        let eps = season.episodes || [];
+        let currentIndex = eps.findIndex(e => e.idEpisode === episodeAktif.idEpisode);
+        
+        // Karena unshift (terbaru di atas/index 0), maka Next Episode adalah index berkurang, Prev adalah index bertambah
+        let nextEp = (currentIndex > 0) ? eps[currentIndex - 1] : null;
+        let prevEp = (currentIndex < eps.length - 1) ? eps[currentIndex + 1] : null;
+    %>
+    <div class="episode-control-nav">
+        <% if (prevEp) { %>
+            <a href="/Hentai/tonton/<%= season.id %>/<%= prevEp.idEpisode %>" class="btn-control">
+                <i class="fa-solid fa-backward"></i> Eps Sebelumnya
+            </a>
+        <% } else { %>
+            <a href="#" class="btn-control disabled"><i class="fa-solid fa-backward"></i> Eps Sebelumnya</a>
+        <% } %>
+
+        <% if (nextEp) { %>
+            <a href="/Hentai/tonton/<%= season.id %>/<%= nextEp.idEpisode %>" class="btn-control" style="color: #ff69b4;">
+                Eps Selanjutnya <i class="fa-solid fa-forward"></i>
+            </a>
+        <% } else { %>
+            <a href="#" class="btn-control disabled">Eps Selanjutnya <i class="fa-solid fa-forward"></i></a>
+        <% } %>
+    </div>
+
+    <div class="playlist-area">
+        <div class="playlist-title">Nonton Episode Lain</div>
+        <div class="playlist-scroll">
+            <% eps.forEach(ep => { %>
+                <a href="/Hentai/tonton/<%= season.id %>/<%= ep.idEpisode %>" 
+                   class="playlist-item <%= (ep.idEpisode === episodeAktif.idEpisode) ? 'active' : '' %>">
+                    <i class="fa-solid <%= (ep.idEpisode === episodeAktif.idEpisode) ? 'fa-circle-dot' : 'fa-play-circle' %>"></i>
+                    <span><%= ep.judulEpisode %></span>
+                </a>
+            <% }) %>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
+

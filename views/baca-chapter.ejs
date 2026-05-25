@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= komik.judul %> - <%= chapterAktif.judulChapter %></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
+        body {
+            background: #1a1220;
+            color: #fff;
+            min-height: 100vh;
+            padding-bottom: 40px;
+        }
+
+        /* 1. WARNA BIRU MUDA: Header Judul Atas */
+        .reader-header {
+            background: rgba(43, 29, 56, 0.95);
+            padding: 15px;
+            text-align: center;
+            border-bottom: 2px solid #e05ec7;
+        }
+        .reader-header h1 {
+            font-size: 16px;
+            font-weight: 900;
+            color: #5ce0e0; /* Efek Biru Muda */
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .reader-header p {
+            font-size: 11px;
+            color: #bbb;
+        }
+        .reader-header p a {
+            color: #f397e0;
+            text-decoration: none;
+        }
+
+        /* Toolbar Navigasi Kontrol */
+        .reader-tools {
+            max-width: 600px;
+            margin: 10px auto;
+            padding: 0 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .selector-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* 2 & 3. WARNA PUTIH & BIRU TUA: Dropdown Pilihan */
+        .select-custom {
+            flex: 1;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #333;
+            font-size: 13px;
+            font-weight: bold;
+            outline: none;
+            cursor: pointer;
+        }
+        .select-ch { background: #ffffff; color: #000; } /* Putih */
+        .select-mode { background: #1b3a61; color: #fff; } /* Biru Tua */
+
+        .nav-action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.05);
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        /* 4. WARNA MERAH: Info Total Gambar Halaman */
+        .counter-images {
+            font-size: 13px;
+            font-weight: bold;
+            color: #ff4d4d; /* Warna Merah */
+        }
+
+        /* 5. WARNA HIJAU: Tombol Prev & Next */
+        .nav-buttons-group {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-nav {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 900;
+            text-decoration: none;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            border: 1px solid #000;
+        }
+        .btn-prev { background: #555; color: #fff; }
+        .btn-next { background: #2ecc71; color: #fff; } /* Warna Hijau Terang */
+        .btn-disabled { opacity: 0.4; pointer-events: none; }
+
+        /* 6. WARNA ORANGE: Wadah Pembaca Konten Lembaran Strip Komik */
+        .manga-reader-area {
+            max-width: 600px;
+            margin: 15px auto;
+            background: #000;
+            border: 3px solid #e67e22; /* Bingkai Warna Orange */
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        .manga-reader-area img {
+            width: 100%;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* SCRIPT MODE FULL SCREEN EMERGENCY */
+        .manga-reader-area:fullscreen {
+            max-width: 100vw !important;
+            margin: 0 !important;
+            border: none !important;
+            border-radius: 0 !important;
+            overflow-y: auto !important;
+            background: #000;
+        }
+        .manga-reader-area:fullscreen img {
+            max-width: 600px;
+            margin: 0 auto 2px auto;
+        }
+
+        /* Tombol Keluar Floating Kecil saat Full Screen */
+        .btn-exit-fullscreen {
+            display: none;
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 0, 0, 0.8);
+            color: #fff;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 99999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <button id="exitFsBtn" class="btn-exit-fullscreen" onclick="matikanFullScreen()">X</button>
+
+    <div class="reader-header">
+        <h1><%= komik.judul %> <%= chapterAktif.judulChapter %></h1>
+        <p>Semua chapter ada di <a href="/baca/<%= komik.id %>"><%= komik.judul %></a></p>
+    </div>
+
+    <div class="reader-tools">
+        <div class="selector-row">
+            <select class="select-custom select-ch" onchange="location = this.value;">
+                <% komik.chapters.forEach((ch) => { %>
+                    <option value="/komik/<%= komik.id %>/baca-chapter/<%= ch.idChapter %>" <%= ch.idChapter === chapterAktif.idChapter ? 'selected' : '' %>>
+                        <%= ch.judulChapter %>
+                    </option>
+                <% }) %>
+            </select>
+
+            <select class="select-custom select-mode" onchange="cekOpsiMode(this)">
+                <option value="normal">Normal View</option>
+                <option value="fullscreen">🔥 Full Page (Full Screen)</option>
+            </select>
+        </div>
+
+        <div class="nav-action-row">
+            <div class="counter-images">
+<i class="fa-regular fa-images"></i> 1/<%= (chapterAktif.lembaran && chapterAktif.lembaran.length) ? chapterAktif.lembaran.length : 0 %>
+            </div>
+
+            <div class="nav-buttons-group">
+                <% if (prevChapter) { %>
+                    <a href="/komik/<%= komik.id %>/baca-chapter/<%= prevChapter.idChapter %>" class="btn-nav btn-prev"><i class="fa-solid fa-angle-left"></i> Prev</a>
+                <% } else { %>
+                    <a href="#" class="btn-nav btn-prev btn-disabled"><i class="fa-solid fa-angle-left"></i> Prev</a>
+                <% } %>
+
+                <% if (nextChapter) { %>
+                    <a href="/komik/<%= komik.id %>/baca-chapter/<%= nextChapter.idChapter %>" class="btn-nav btn-next">Next <i class="fa-solid fa-angle-right"></i></a>
+                <% } else { %>
+                    <a href="#" class="btn-nav btn-next btn-disabled">Next <i class="fa-solid fa-angle-right"></i></a>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <div class="manga-reader-area" id="boxKomik">
+        <% if(chapterAktif.lembaran && chapterAktif.lembaran.length > 0) { %>
+            <% chapterAktif.lembaran.forEach((img) => { %>
+                <img src="<%= img %>" alt="Page Lembar Komik">
+            <% }) %>
+        <% } else { %>
+            <div style="text-align: center; padding: 40px; color: #ff4d4d; font-weight: bold;">
+                Lembaran isi gambar bab ini belum diunggah oleh admin.
+            </div>
+        <% } %>
+    </div>
+
+    <script>
+        const targetWadah = document.getElementById('boxKomik');
+        const tombolSilang = document.getElementById('exitFsBtn');
+
+        function cekOpsiMode(elemen) {
+            if (elemen.value === "fullscreen") {
+                nyalakanFullScreen();
+            }
+        }
+
+        function nyalakanFullScreen() {
+            if (targetWadah.requestFullscreen) {
+                targetWadah.requestFullscreen();
+            } else if (targetWadah.webkitRequestFullscreen) { /* Safari / HP Jadul */
+                targetWadah.webkitRequestFullscreen();
+            }
+        }
+
+        function matikanFullScreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+        }
+
+        // Pantau perubahan mode layar untuk menyembunyikan/menampilkan tombol keluar silang 'X'
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                tombolSilang.style.display = "block";
+            } else {
+                tombolSilang.style.display = "none";
+                document.querySelector('.select-mode').value = "normal";
+            }
+        });
+    </script>
+
+</body>
+</html>
+

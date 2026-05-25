@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>King Komik - <%= komik.judul %></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
+        body {
+            background: linear-gradient(to bottom, #fffbeb, #e2b0ff, #9f75b8);
+            min-height: 100vh;
+            color: #333;
+            padding-top: 30px; 
+            padding-bottom: 80px; 
+        }
+        body.dark-mode { background: #121212 !important; color: #f0f0f0 !important; }
+        body.dark-mode .info-box { background: rgba(20, 20, 20, 0.95); }
+
+        .btn-kembali-kanan {
+            position: fixed; top: 20px; right: 20px; background: rgba(255, 255, 255, 0.8);
+            color: #000; width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; font-size: 20px; font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15); z-index: 1001;
+        }
+
+        .manga-detail-container { max-width: 600px; margin: 0 auto; padding: 15px; }
+
+        .info-box {
+            background: rgba(43, 29, 56, 0.9); border-radius: 12px; padding: 20px;
+            color: #fff; box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .manga-title-main { font-size: 20px; font-weight: 900; color: #f397e0; margin-bottom: 10px; text-transform: uppercase; }
+        .manga-synopsis { font-size: 13px; line-height: 1.6; color: #e0e0e0; margin-bottom: 20px; text-align: justify; }
+
+        .chapter-quick-nav { display: flex; gap: 10px; margin-bottom: 20px; }
+        .quick-btn { flex: 1; background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 6px; text-align: center; font-size: 13px; color: #fff; border: 1px solid #e05ec7; font-weight: bold; text-decoration: none; }
+        .quick-btn span { color: #f397e0; }
+
+        .poster-area { text-align: center; margin-bottom: 20px; }
+        .poster-area img { width: 100%; max-width: 200px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+
+        .btn-favorit { display: block; width: 100%; background: linear-gradient(to bottom, #f397e0, #e05ec7); color: #fff; padding: 12px; font-weight: bold; border-radius: 8px; text-align: center; text-decoration: none; margin-bottom: 12px; font-size: 14px; text-transform: uppercase; border: none; cursor: pointer; }
+        .btn-favorit.aktif { background: linear-gradient(to bottom, #ff4da6, #ff0066); }
+
+        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+        .info-table td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .info-table td:first-child { font-weight: bold; color: #f397e0; width: 35%; }
+
+        .btn-edit-inline { background: none; border: none; color: #2ecc71; cursor: pointer; font-size: 14px; margin-left: 8px; }
+        .genre-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+        .tag { background: #e05ec7; color: #fff; padding: 5px 12px; border-radius: 15px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+
+        .box-tambah-ch { background: rgba(255,255,255,0.15); padding: 15px; border-radius: 8px; margin-top: 15px; border: 1px dashed #e05ec7; }
+        .box-tambah-ch h4 { font-size: 12px; color: #fff; margin-bottom: 8px; text-transform: uppercase; }
+        .box-tambah-ch input, .box-tambah-ch button { padding: 8px; border-radius: 4px; border: none; font-size: 12px; font-weight: bold; }
+        .box-tambah-ch button { background: #2ecc71; color: white; cursor: pointer; }
+
+        .chapter-section-header { background: #e5b3f0; color: #000; padding: 12px; font-weight: 900; font-size: 14px; border-radius: 8px; margin-top: 25px; margin-bottom: 5px; text-transform: uppercase; }
+        .search-ch-box { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.1); font-size: 13px; font-weight: bold; margin-bottom: 12px; outline: none; }
+
+        .list-chapters-container { display: flex; flex-direction: column; gap: 8px; margin-bottom: 25px; }
+        .chapter-row { display: flex; justify-content: space-between; align-items: center; background: rgba(43, 29, 56, 0.85); padding: 12px 15px; border-radius: 8px; border-left: 5px solid #e05ec7; color: white; }
+        .ch-info-left { display: flex; flex-direction: column; gap: 4px; text-decoration: none; }
+        .ch-title-txt { font-size: 14px; font-weight: bold; color: #fff; }
+        .ch-date-txt { font-size: 11px; color: #bbb; }
+        
+        .btn-action-del { background: #e74c3c; color: white; border: none; padding: 6px 12px; font-size: 11px; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .btn-action-del:hover { background: #c0392b; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: linear-gradient(to top, #ca8cd8, #e5b3f0); border-top: 2px solid rgba(0, 0, 0, 0.1); display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
+        .nav-item { text-align: center; text-decoration: none; color: #000; font-size: 11px; font-weight: bold; display: flex; flex-direction: column; align-items: center; }
+        .nav-item i { font-size: 20px; margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+    <a href="/" class="btn-kembali-kanan">←</a>
+
+    <div class="manga-detail-container">
+        <div class="info-box">
+            <h2 class="manga-title-main"><%= komik.judul %></h2>
+            <p class="manga-synopsis"><%= komik.deskripsi || 'Tidak ada deskripsi.' %></p>
+
+            <div class="chapter-quick-nav">
+                <% if (komik.chapters && komik.chapters.length > 0) { %>
+                    <a href="/komik/<%= komik.id %>/baca-chapter/<%= komik.chapters[komik.chapters.length - 1].idChapter %>" class="quick-btn">
+                        Awal: <span><%= komik.chapters[komik.chapters.length - 1].judulChapter %></span>
+                    </a>
+                    <a href="/komik/<%= komik.id %>/baca-chapter/<%= komik.chapters[0].idChapter %>" class="quick-btn">
+                        Terbaru: <span><%= komik.chapters[0].judulChapter %></span>
+                    </a>
+                <% } else { %>
+                    <div class="quick-btn">Belum ada bab rilis</div>
+                <% } %>
+            </div>
+
+            <div class="poster-area">
+                <img src="<%= komik.cover %>" alt="Poster Komik">
+            </div>
+
+            <button id="favBtn" class="btn-favorit" onclick="toggleFavorit()">
+                <i class="fa-solid fa-heart"></i> <span id="favText">Tambah Favorit</span>
+            </button>
+            <form action="/baca/<%= komik.id %>/hapus-komik" method="POST" onsubmit="return confirm('PERINGATAN: Apakah kamu yakin ingin menghapus komik \'<%= komik.judul %>\' beserta seluruh chapternya secara permanen?');" style="margin-top: 10px; margin-bottom: 20px;">
+                <button type="submit" style="display: block; width: 100%; background: linear-gradient(to bottom, #ff6b6b, #e74c3c); color: #fff; padding: 12px; font-weight: bold; border-radius: 8px; text-align: center; font-size: 14px; text-transform: uppercase; border: none; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.15);">
+                    <i class="fa-solid fa-trash-can"></i> Hapus Komik Ini Permanent
+                </button>
+            </form>
+
+<table class="info-table">
+    <tr>
+        <td>Alternative</td>
+        <td>
+		   <% if (isAdmin) { %>
+            <span id="txt-alternative"><%= komik.infoDetail.alternative %></span>
+            <button class="btn-edit-inline" onclick="triggerEdit('alternative')"><i class="fa-solid fa-pencil"></i></button>
+         <% } %>   
+     </td>
+    </tr>
+    <tr>
+        <td>Status</td>
+        <td>
+		   <% if (isAdmin) { %>
+            <span id="txt-status"><%= komik.infoDetail.status %></span>
+            <button class="btn-edit-inline" onclick="triggerEdit('status')"><i class="fa-solid fa-pencil"></i></button>
+       	     <% } %>
+	 </td>
+    </tr>
+    <tr>
+        <td>Type</td>
+        <td>
+		   <% if (isAdmin) { %>
+            <span id="txt-type"><%= komik.infoDetail.type %></span>
+            <button class="btn-edit-inline" onclick="triggerEdit('type')"><i class="fa-solid fa-pencil"></i></button>
+             <% } %>
+	</td>
+    </tr>
+    <tr>
+        <td>Released</td>
+        <td>
+		   <% if (isAdmin) { %>
+            <span id="txt-released"><%= komik.infoDetail.released %></span>
+            <button class="btn-edit-inline" onclick="triggerEdit('released')"><i class="fa-solid fa-pencil"></i></button>
+             <% } %>
+	</td>
+    </tr>
+    <tr>
+        <td>Author</td>
+        <td>
+		   <% if (isAdmin) { %>
+            <span id="txt-author"><%= komik.infoDetail.author %></span>
+            <button class="btn-edit-inline" onclick="triggerEdit('author')"><i class="fa-solid fa-pencil"></i></button>
+       	     <% } %>
+	 </td>
+    </tr>
+    <tr>
+		   <% if (isAdmin) { %>
+        <td>Updated On</td>
+        <td><span style="color:#aaa;"><%= komik.infoDetail.updatedOn %></span></td>
+        <% } %>
+	 </tr>
+</table>
+
+            <div class="genre-tags">
+                <% komik.genre.forEach(function(g) { %>
+                    <span class="tag"><%= g %></span>
+                <% }); %>
+            </div>
+	   <% if (isAdmin) { %>
+            <div class="box-tambah-ch">
+                <h4><i class="fa-solid fa-plus"></i> Panel Rilis Bab Baru (Admin)</h4>
+                <form action="/api/tambah-chapter/<%= komik.id %>" method="POST" enctype="multipart/form-data" style="display:flex; flex-direction:column; gap:8px;">
+                    <input type="number" name="nomorCh" placeholder="Nomor Bab (Misal: 2)" required style="width:100%; background: #222; color:#fff; border: 1px solid #444;">
+                    <input type="file" name="gambarChapter" accept="image/*" multiple required style="width:100%; color:#fff;">
+                    <button type="submit">Rilis Chapter Baru</button>
+                    <% } %>
+		 </form>
+            </div>
+        </div>
+
+        <div class="chapter-section-header">Daftar Chapter <%= komik.judul %></div>
+        <input type="text" id="searchCh" class="search-ch-box" placeholder="Cari Bab..." onkeyup="filterChapters()">
+
+        <div class="list-chapters-container" id="chapterListArea">
+            <% if(komik.chapters && komik.chapters.length > 0) { %>
+                <% komik.chapters.forEach((ch) => { %>
+                    <div class="chapter-row">
+                        <a href="/komik/<%= komik.id %>/baca-chapter/<%= ch.idChapter %>" class="ch-info-left">
+                            <span class="ch-title-txt"><%= komik.judul %> - <%= ch.judulChapter %></span>
+                            <span class="ch-date-txt"><%= ch.tanggal %></span>
+                        </a>
+                        
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <form action="/baca/<%= komik.id %>/hapus-chapter/<%= ch.idChapter %>" method="POST" onsubmit="return confirm('Yakin ingin hapus chapter ini?');" style="margin:0;">
+                                <button type="submit" class="btn-action-del">🗑️ Hapus</button>
+                            </form>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p style="color:#fff; text-align:center; padding:10px;">Belum ada bab yang diterbitkan.</p>
+            <% } %>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="/" class="nav-item"><i class="fa-solid fa-house"></i>Home</a>
+        <a href="/" class="nav-item"><i class="fa-solid fa-folder"></i>Manga List</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-heart"></i>Favorite</a>
+    </div>
+
+    <script>
+function triggerEdit(fieldName) {
+    let userConfirm = prompt("Masukkan data baru untuk " + fieldName + ":");
+    
+    // Validasi: Jika user menekan tombol Batal (Cancel) atau input kosong, abaikan.
+    if (userConfirm === null || userConfirm.trim() === "") return;
+    
+    // 1. Terapkan perubahan ke layar secara instan (Biar langsung berubah tanpa nunggu respon server)
+    const elemenTeks = document.getElementById('txt-' + fieldName);
+    if (elemenTeks) {
+        elemenTeks.innerText = userConfirm;
+    }
+
+    // 2. Kirim datanya ke backend server.js agar tersimpan permanen di memori
+    fetch('/api/edit-info/<%= komik.id %>', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ field: fieldName, value: userConfirm })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.success) {
+            alert("Gagal sinkronisasi ke server, silakan segarkan halaman.");
+        }
+    })
+    .catch(err => {
+        console.log("Menjalankan mode penyimpanan lokal sementara.");
+    });
+}
+
+        function filterChapters() {
+            let input = document.getElementById('searchCh').value.toLowerCase();
+            let rows = document.getElementsByClassName('chapter-row');
+            for(let i=0; i<rows.length; i++) {
+                let text = rows[i].querySelector('.ch-title-txt').innerText.toLowerCase();
+                rows[i].style.display = text.includes(input) ? "flex" : "none";
+            }
+        }
+
+        function terapkanTemaGlobal() {
+            const tema = localStorage.getItem('kingKomikTheme') || 'light';
+            if (tema === 'dark') document.body.classList.add('dark-mode');
+            else document.body.classList.remove('dark-mode');
+        }
+        document.addEventListener("DOMContentLoaded", terapkanTemaGlobal);
+    </script>
+</body>
+</html>
+
