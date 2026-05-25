@@ -496,7 +496,7 @@ app.post('/tambah-komik', cekAdmin, upload.fields([
 const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server berjalan megah di http://localhost:${PORT}`);
 });
-
-server.timeout = 900000;
+module.exports = app;
+xserver.timeout = 900000;
 server.keepAliveTimeout = 900000;
 
